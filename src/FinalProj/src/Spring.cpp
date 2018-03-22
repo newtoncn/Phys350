@@ -2,19 +2,19 @@
 // Created by da-cam on 21/03/18.
 //
 
-#include "../include/Spring.h"
+#include <Spring.h>
 
 Spring::Spring(Mass* mass1, Mass* mass2, float springConstant, float SpringLength, float frictionConstant) {
     this->springConstant = springConstant;               // Set The springConstant
     this->springLength = springLength;               // Set The springLength
     this->frictionConstant = frictionConstant;           // Set The frictionConstant
 
-    this->Mass1 = mass1;                     // Set mass1
-    this->Mass2 = mass2;                     // Set mass2
+    this->Mass1* => mass1;                     // Set mass1
+    this->Mass2* => mass2;                     // Set mass2
 }
 
-void solve() {
-    Vector3D springVector = mass1->pos - mass2->pos;      // Vector Between The Two Masses
+void Spring::solve() {
+    Vector3D springVector = Mass1->pos - Mass2->pos;      // Vector Between The Two Masses
 
     float r = springVector.length();                // Distance Between The Two Masses
 

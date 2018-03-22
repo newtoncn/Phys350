@@ -2,8 +2,9 @@
 // Created by da-cam on 21/03/18.
 //
 
-#include <GL/freeglut.h>
-#include <GL/gl.h>
+#include <include\GL\freeglut.h>
+#include <gl\GL.h>
+
 
 void renderFunction()
 {
