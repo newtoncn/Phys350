@@ -15,13 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\Spring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Physics1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RopeSimulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

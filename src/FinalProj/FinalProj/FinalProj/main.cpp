@@ -32,40 +32,26 @@ char s[30];                                // Tmp variable for storing the displ
 int time, timeprev = 0;											 // For calculating elapsed time
 bool fullScreen = false;										 // toggle for fullscreen mode
 
-																 /*
-																 ConstantVelocity is an object from Physics1.h. It is a container for simulating masses.
-																 Specifically, it creates a mass and sets its velocity as (1, 0, 0) so that the mass
-																 moves with 1.0f meters / second in the x direction.
-																 */
-ConstantVelocity* constantVelocity = new ConstantVelocity();
 
-/*
-MotionUnderGravitation is an object from Physics1.h. It is a container for simulating masses.
-This object applies gravitation to all masses it contains. This gravitation is set by the
-constructor which is (0.0f, -9.81f, 0.0f) for now (see below). This means a gravitational acceleration
-of 9.81 meter per (second * second) in the negative y direction. MotionUnderGravitation
-creates one mass by default and sets its position to (-10, 0, 0) and its velocity to
-(10, 15, 0)
-*/
-MotionUnderGravitation* motionUnderGravitation =
-new MotionUnderGravitation(Vector3D(0.0f, -9.81f, 0.0f));
-
-/*
-MassConnectedWithSpring is an object from Physics1.h. It is a container for simulating masses.
-This object has a member called connectionPos, which is the connection position of the spring
-it simulates. All masses in this container are pulled towards the connectionPos by a spring
-with a constant of stiffness. This constant is set by the constructor and for now it is 2.0
-(see below).
-*/
-/* MassConnectedWithSpring* massConnectedWithSpring =
-new MassConnectedWithSpring(8.0f); */
-MassConnectedWithSpring* massConnectedWithSpring =
-new MassConnectedWithSpring(8.0f, Vector3D(0.0, 0.0, 0.0), Vector3D(-3.0, 9.0, 0.0));
 
 float slowMotionRatio = 10.0f;									// slowMotionRatio Is A Value To Slow Down The Simulation, Relative To Real World Time
 float timeElapsed = 0;													// Elapsed Time In The Simulation (Not Equal To Real World's Time Unless slowMotionRatio Is 1
 GLuint	base;																		// Base Display List For The Font Set
 
+
+RopeSimulation* ropeSimulation =
+new RopeSimulation(
+	80,                             // 80 Particles (Masses)
+	0.05f,                              // Each Particle Has A Weight Of 50 Grams
+	10000.0f,                           // springConstant In The Rope
+	0.05f,                              // Normal Length Of Springs In The Rope
+	0.2f,                               // Spring Inner Friction Constant
+	Vector3D(0, -9.81f, 0),                     // Gravitational Acceleration
+	0.02f,                              // Air Friction Constant
+	100.0f,                             // Ground Repel Constant
+	0.2f,                               // Ground Slide Friction Constant
+	2.0f,                               // Ground Absoption Constant
+	-1.5f);                             // Height Of Ground
 
 																					/* A general OpenGL initialization function.  Sets all of the initial parameters. */
 void InitGL(int Width, int Height)	        // We call this right after our OpenGL window is created.
@@ -95,20 +81,6 @@ void glPrint(float x, float y, void *font, const char *string) {
 	}
 }
 
-void Deinitialize(void)										// Any User DeInitialization Goes Here
-{
-	constantVelocity->release();
-	delete(constantVelocity);
-	constantVelocity = NULL;
-
-	motionUnderGravitation->release();
-	delete(motionUnderGravitation);
-	motionUnderGravitation = NULL;
-
-	massConnectedWithSpring->release();
-	delete(massConnectedWithSpring);
-	massConnectedWithSpring = NULL;
-}
 
 /* The function called when our window is resized (which shouldn't happen, because we're fullscreen) */
 void ReSizeGLScene(int Width, int Height)
@@ -159,9 +131,7 @@ void DrawGLScene()
 																			// 计算经过时间片(dt)后, 物体的新位置, 新运行方向等.
 	for (int a = 0; a < numOfIterations; ++a)					// We Need To Iterate Simulations "numOfIterations" Times
 	{
-		constantVelocity->operate(dt);									// Iterate constantVelocity Simulation By dt Seconds
-		motionUnderGravitation->operate(dt);						// Iterate motionUnderGravitation Simulation By dt Seconds
-		massConnectedWithSpring->operate(dt);						// Iterate massConnectedWithSpring Simulation By dt Seconds
+		ropeSimulation->operate(dt);								// Iterate Rope Simulation By dt Seconds
 	}
 
 	// Position Camera 40 Meters Up In Z-Direction.
@@ -194,59 +164,20 @@ void DrawGLScene()
 	glEnd();
 	// Drawing The Coordinate Plane Ends Here.
 
-	// Draw All Masses In constantVelocity Simulation (Actually There Is Only One Mass In This Example Of Code)
-	glColor3ub(255, 0, 0);										// Draw In Red
-	int a;
-	for (a = 0; a < constantVelocity->numOfMasses; ++a)
-	{
-		Mass* mass = constantVelocity->getMass(a);
-		Vector3D* pos = &mass->pos;
-
-		glPrint(pos->x, pos->y + 1, (void *)font, "Mass with constant vel");
-
-		glPointSize(4);
-		glBegin(GL_POINTS);
-		glVertex3f(pos->x, pos->y, pos->z);
-		glEnd();
-	}
-	// Drawing Masses In constantVelocity Simulation Ends Here.
-
-	// Draw All Masses In motionUnderGravitation Simulation (Actually There Is Only One Mass In This Example Of Code)
-	glColor3ub(255, 255, 0);									// Draw In Yellow
-	for (a = 0; a < motionUnderGravitation->numOfMasses; ++a)
-	{
-		Mass* mass = motionUnderGravitation->getMass(a);
-		Vector3D* pos = &mass->pos;
-
-		glPrint(pos->x, pos->y + 1, (void *)font, "Motion under gravitation");
-
-		glPointSize(4);
-		glBegin(GL_POINTS);
-		glVertex3f(pos->x, pos->y, pos->z);
-		glEnd();
-	}
-	// Drawing Masses In motionUnderGravitation Simulation Ends Here.
-
-	// Draw All Masses In massConnectedWithSpring Simulation (Actually There Is Only One Mass In This Example Of Code)
+	// Draw All Masses In Rope Simulation
 	glColor3ub(0, 255, 0);										// Draw In Green
-	for (a = 0; a < massConnectedWithSpring->numOfMasses; ++a)
+	for (int a = 0; a < ropeSimulation->numOfMasses; ++a)
 	{
-		Mass* mass = massConnectedWithSpring->getMass(a);
+		Mass* mass = ropeSimulation->getMass(a);
 		Vector3D* pos = &mass->pos;
 
-		glPrint(pos->x, pos->y + 1, (void *)font, "Mass connected with spring");
+		glPrint(pos->x, pos->y + 1, (void *)font, "Mass");
 
 		glPointSize(8);
 		glBegin(GL_POINTS);
 		glVertex3f(pos->x, pos->y, pos->z);
 		glEnd();
 
-		// Draw A Line From The Mass Position To Connection Position To Represent The Spring
-		glBegin(GL_LINES);
-		glVertex3f(pos->x, pos->y, pos->z);
-		pos = &massConnectedWithSpring->connectionPos;
-		glVertex3f(pos->x, pos->y, pos->z);
-		glEnd();
 	}
 	// Drawing Masses In massConnectedWithSpring Simulation Ends Here.
 
@@ -308,13 +239,13 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
 
 	/* get a 640 x 480 window */
-	glutInitWindowSize(640, 480);
+	glutInitWindowSize(1920, 1080);
 
 	/* the window starts at the upper left corner of the screen */
 	glutInitWindowPosition(0, 0);
 
 	/* Open a window */
-	window = glutCreateWindow("Jeff Molofee's GL Code Tutorial ...");
+	window = glutCreateWindow("Phys 350 Project!!");
 
 	/* Register the function to do all our OpenGL drawing. */
 	glutDisplayFunc(&DrawGLScene);

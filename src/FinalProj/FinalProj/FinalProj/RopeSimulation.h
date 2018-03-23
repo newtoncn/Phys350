@@ -61,7 +61,7 @@ public:
 		springs = new Spring*[numOfMasses - 1];             // Create [numOfMasses - 1] Pointers For springs
 															// ([numOfMasses - 1] Springs Are Necessary For numOfMasses)
 
-		for (a = 0; a < numOfMasses - 1; ++a)                // To Create Everyone Of Each Start A Loop
+		for (int a = 0; a < numOfMasses - 1; ++a)                // To Create Everyone Of Each Start A Loop
 		{
 			// Create The Spring With Index "a" By The Mass With Index "a" And Another Mass With Index "a + 1".
 			springs[a] = new Spring(masses[a], masses[a + 1],

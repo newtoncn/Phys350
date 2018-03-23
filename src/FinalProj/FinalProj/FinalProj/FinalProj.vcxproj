@@ -153,9 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\Spring.h" />
     <ClInclude Include="Physics1.h" />
-    <ClInclude Include="RopeSimulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
