@@ -44,8 +44,8 @@ new RopeSimulation(
 	80,                             // 80 Particles (Masses)
 	0.05f,                              // Each Particle Has A Weight Of 50 Grams
 	10000.0f,                           // springConstant In The Rope
-	0.05f,                              // Normal Length Of Springs In The Rope
-	0.2f,                               // Spring Inner Friction Constant
+	1.0f,                              // Normal Length Of Springs In The Rope
+	1.0f,                               // Spring Inner Friction Constant
 	Vector3D(0, -9.81f, 0),                     // Gravitational Acceleration
 	0.02f,                              // Air Friction Constant
 	100.0f,                             // Ground Repel Constant
@@ -171,7 +171,7 @@ void DrawGLScene()
 		Mass* mass = ropeSimulation->getMass(a);
 		Vector3D* pos = &mass->pos;
 
-		glPrint(pos->x, pos->y + 1, (void *)font, "Mass");
+		glPrint(pos->x, pos->y + 1, (void *)font, "");
 
 		glPointSize(8);
 		glBegin(GL_POINTS);
@@ -179,19 +179,19 @@ void DrawGLScene()
 		glEnd();
 
 	}
-	// Drawing Masses In massConnectedWithSpring Simulation Ends Here.
+	// Drawing Masses In Rope Simulation Ends Here.
 
 
 	glColor3ub(255, 255, 255);									// Draw In White
 
 	sprintf_s(s, "Time elapsed (seconds): %.2f", timeElapsed);
-	glPrint(-5.0f, 14, (void *)font, s);	// Print timeElapsed
+	glPrint(-5.0f, 8, (void *)font, s);	// Print timeElapsed
 
 	sprintf_s(s, "Slow motion ratio: %.2f", slowMotionRatio);
-	glPrint(-5.0f, 13, (void *)font, s);	// Print slowMotionRatio
+	glPrint(-5.0f, 6, (void *)font, s);	// Print slowMotionRatio
 
-	glPrint(-5.0f, 12, (void *)font, "Press F2 for normal motion");
-	glPrint(-5.0f, 11, (void *)font, "Press F3 for slow motion");
+	glPrint(-5.0f, 4, (void *)font, "Press F2 for normal motion");
+	glPrint(-5.0f, 0, (void *)font, "Press F3 for slow motion");
 
 	glFlush();													// Flush The GL Rendering Pipeline
 
@@ -222,6 +222,22 @@ void keyPressed(int key, int x, int y)
 		slowMotionRatio = 10.0f;								// Set slowMotionRatio To 10.0f (Very Slow Motion)
 		break;
 
+	case GLUT_KEY_F4:
+		ropeSimulation =
+			new RopeSimulation(
+				80,                             // 80 Particles (Masses)
+				0.05f,                              // Each Particle Has A Weight Of 50 Grams
+				10000.0f,                           // springConstant In The Rope
+				1.0f,                              // Normal Length Of Springs In The Rope
+				1.0f,                               // Spring Inner Friction Constant
+				Vector3D(0, -9.81f, 0),                     // Gravitational Acceleration
+				0.02f,                              // Air Friction Constant
+				100.0f,                             // Ground Repel Constant
+				0.2f,                               // Ground Slide Friction Constant
+				2.0f,                               // Ground Absoption Constant
+				-1.5f);                             // Height Of Ground
+		timeElapsed = 0.0f;
+		break;
 	}
 }
 
@@ -263,7 +279,7 @@ int main(int argc, char **argv)
 	glutSpecialFunc(&keyPressed);
 
 	/* Initialize our window. */
-	InitGL(640, 480);
+	InitGL(1920, 1080);
 
 	/* Start Event Processing Engine */
 	glutMainLoop();
